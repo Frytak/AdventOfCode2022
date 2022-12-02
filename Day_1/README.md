@@ -44,3 +44,8 @@ In case the Elves get hungry and need extra snacks, they need to know which Elf 
 Find the Elf carrying the most Calories. <span style="color:#fff;text-shadow: 0 0 3px #fff;">How many total Calories is that Elf carrying?</span>
 
 To begin, [get your puzzle input](https://adventofcode.com/2022/day/1/input).
+
+<details>
+    <summary style="color:#fff;text-shadow: 0 0 3px #fff;">Answer</summary>
+    Elf carrying the most has 69310 calories of food!
+</details>
