@@ -11,35 +11,3 @@ You can choose any programming language you like to solve these puzzles so that'
 Each solution will be in it's own folder with a README file containing the task of a puzzle with a link to it and my answer which is hidden so no worries, you won't get the solution by accident if you don't want to see it and participate yourself!
 
 <img src="AdventOfCode.jpg">
-
-# Table of Solutions
-
-For lazy people 😅
-
-| Day | Solution                                                                          |
-| --- | --------------------------------------------------------------------------------- |
-| 1   | [Calorie Counting](https://github.com/Frytak/AdventOfCode2022/tree/main/Day_1)    |
-| 2   | [Rock Paper Scissors](https://github.com/Frytak/AdventOfCode2022/tree/main/Day_2) |
-| 3   | []()                                                                              |
-| 4   | []()                                                                              |
-| 5   | []()                                                                              |
-| 6   | []()                                                                              |
-| 7   | []()                                                                              |
-| 8   | []()                                                                              |
-| 9   | []()                                                                              |
-| 10  | []()                                                                              |
-| 11  | []()                                                                              |
-| 12  | []()                                                                              |
-| 13  | []()                                                                              |
-| 14  | []()                                                                              |
-| 15  | []()                                                                              |
-| 16  | []()                                                                              |
-| 17  | []()                                                                              |
-| 18  | []()                                                                              |
-| 19  | []()                                                                              |
-| 20  | []()                                                                              |
-| 21  | []()                                                                              |
-| 22  | []()                                                                              |
-| 23  | []()                                                                              |
-| 24  | []()                                                                              |
-| 25  | []()                                                                              |
