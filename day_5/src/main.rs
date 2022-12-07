@@ -1,7 +1,7 @@
-use std::fs;
+use std::{fs, vec};
 
 fn main() {
-    let input_file_path = "C:\\Users\\fryta\\Pulpit\\~\\Important\\Programming Projects\\AdventOfCode2022\\day_5\\src\\input.txt";
+    let input_file_path = "C:\\Users\\Frytak\\Desktop\\~\\Important\\Programming Projects\\AdventOfCode2022\\day_5\\src\\input.txt";
     let input = fs::read_to_string(input_file_path)
         .expect("Something went wrong reading the file");
 
@@ -34,31 +34,37 @@ fn main() {
     
 
     // Revert all the vectors
-    for i in 0..crates.len()-1 {
+    for i in 0..crates.len() {
         crates[i].reverse();
     }
 
     // Make the moves
-    for line in input.lines().skip(crates.len()+2) {
+    for line in input.lines().skip(crates.len()+1) {
         let text: Vec<_> = line.split(' ').collect();
         
-        let mut move_nums = str::parse::<usize>(text[1]).unwrap() - 1;
-        let mut from = str::parse::<usize>(text[3]).unwrap() - 1;
-        let mut to = str::parse::<usize>(text[5]).unwrap() - 1;
+        let move_nums = str::parse::<usize>(text[1]).unwrap() - 1;
+        let from = str::parse::<usize>(text[3]).unwrap() - 1;
+        let to = str::parse::<usize>(text[5]).unwrap() - 1;
+        let mut appending:Vec<char> = vec![];
 
-        for i in 0..=move_nums {
-            if crates[from].len() == 0 {continue;}
+        for _ in 0..=move_nums {
             let mut_crates = crates[from][crates[from].len() - 1];
-            crates[to].push(mut_crates);
+            appending.push(mut_crates);
             crates[from].pop();
         }
+
+        // To get the part two answer comment this out:
+        //appending.reverse();
+        
+        crates[to].append(&mut appending);
     }
 
+    // Get the top crates
     let mut top = String::from("");
     for i in 0..crates.len() {
+        if crates[i].len() == 0 {continue;}
         top.push(crates[i][crates[i].len() - 1])
     }
 
-    println!("{:?}", crates);
     println!("The crates at the top will be: {:?}", top);
 }
