@@ -36,3 +36,19 @@ Here are a few more examples:
 <span style="color:#fff;text-shadow: 0 0 2px #fff;">How many characters need to be processed before the first start-of-packet marker is detected?</span>
 
 To begin, [get your puzzle input](https://adventofcode.com/2022/day/6/input).
+
+## Part Two
+
+Your device's communication system is correctly detecting packets, but still isn't working. It looks like it also needs to look for <span style="color:#fff;text-shadow: 0 0 2px #fff;">messages</span>.
+
+A <span style="color:#fff;text-shadow: 0 0 2px #fff;">start-of-message marker</span> is just like a start-of-packet marker, except it consists of <span style="color:#fff;text-shadow: 0 0 2px #fff;">14 distinct characters</span> rather than 4.
+
+Here are the first positions of start-of-message markers for all of the above examples:
+
+- `mjqjpqmgbljsphdztnvjfqwrcgsmlb`: first marker after character <span style="color:#fff;text-shadow: 0 0 2px #fff;">`19`</span>
+- `bvwbjplbgvbhsrlpgdmjqwftvncz`: first marker after character <span style="color:#fff;text-shadow: 0 0 2px #fff;">`23`</span>
+- `nppdvjthqldpwncqszvftbrmjlhg`: first marker after character <span style="color:#fff;text-shadow: 0 0 2px #fff;">`23`</span>
+- `nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg`: first marker after character <span style="color:#fff;text-shadow: 0 0 2px #fff;">`29`</span>
+- `zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw`: first marker after character <span style="color:#fff;text-shadow: 0 0 2px #fff;">`26`</span>
+
+<span style="color:#fff;text-shadow: 0 0 2px #fff;">How many characters need to be processed before the first start-of-message marker is detected?</span>

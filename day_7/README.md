@@ -92,3 +92,22 @@ To begin, find all of the directories with a total size of <span style="color:#f
 Find all of the directories with a total size of at most 100000. <span style="color:#fff;text-shadow: 0 0 2px #fff;">What is the sum of the total sizes of those directories?</span>
 
 To begin, [get your puzzle input](https://adventofcode.com/2022/day/7/input).
+
+## Part Two
+
+Now, you're ready to choose a directory to delete.
+
+The total disk space available to the filesystem is <span style="color:#fff;text-shadow: 0 0 2px #fff;">`70000000`</span>. To run the update, you need unused space of at least <span style="color:#fff;text-shadow: 0 0 2px #fff;">`30000000`</span>. You need to find a directory you can delete that will <span style="color:#fff;text-shadow: 0 0 2px #fff;">free up enough space</span> to run the update.
+
+In the example above, the total size of the outermost directory (and thus the total amount of used space) is `48381165`; this means that the size of the unused space must currently be `21618835`, which isn't quite the `30000000` required by the update. Therefore, the update still requires a directory with total size of at least `8381165` to be deleted before it can run.
+
+To achieve this, you have the following options:
+
+- Delete directory `e`, which would increase unused space by `584`.
+- Delete directory `a`, which would increase unused space by `94853`.
+- Delete directory `d`, which would increase unused space by `24933642`.
+- Delete directory `/`, which would increase unused space by `48381165`.
+
+Directories `e` and `a` are both too small; deleting them would not free up enough space. However, directories `d` and `/` are both big enough! Between these, choose the <span style="color:#fff;text-shadow: 0 0 2px #fff;">smallest</span>: `d`, increasing unused space by <span style="color:#fff;text-shadow: 0 0 2px #fff;">`24933642`</span>.
+
+Find the smallest directory that, if deleted, would free up enough space on the filesystem to run the update. <span style="color:#fff;text-shadow: 0 0 2px #fff;">What is the total size of that directory?</span>
