@@ -16,7 +16,7 @@ impl Directory {
 }
 
 fn main() {
-    let input_file_path = "C:\\Users\\fryta\\Pulpit\\~\\Important\\Programming Projects\\AdventOfCode2022\\day_7\\src\\input.txt";
+    let input_file_path = "C:\\Users\\Frytak\\Desktop\\~\\Important\\Programming Projects\\AdventOfCode2022\\day_7\\src\\input.txt";
     let input = fs::read_to_string(input_file_path)
         .expect("Something went wrong reading the file");
 
@@ -76,5 +76,14 @@ fn main() {
         }
     }
 
+    // Get the total size of a directory that is the smallest and will be deleted for at least 30000000 free space to exist
+    let mut total_to_delete: usize = usize::MAX;
+    for i in 1..directories.len() {
+        if directories[i].size < total_to_delete && 70000000 - directories[0].size + directories[i].size >= 30000000 {
+            total_to_delete = directories[i].size;
+        }
+    }
+
     println!("The sum of directories that are at most of 100000 size is {}", sum);
+    println!("The total size of the directory to delete is {}", total_to_delete);
 }
