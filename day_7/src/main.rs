@@ -2,6 +2,7 @@ use std::fs;
 
 #[derive(Debug, Clone)]
 struct Directory {
+    name: String,
     size: usize,
     parent_id: Option<usize>,
 }
@@ -9,6 +10,7 @@ struct Directory {
 impl Directory {
     fn main() -> Directory {
         Directory {
+            name: String::from("/"),
             size: 0,
             parent_id: None,
         }
@@ -42,6 +44,7 @@ fn main() {
                             name.extend(line.split(' ').collect::<Vec<_>>()[2].chars().into_iter());
                             directories.push(
                                 Directory {
+                                    name: name,
                                     size: 0,
                                     parent_id: Some(current_directory),
                                 }
@@ -82,6 +85,10 @@ fn main() {
         if directories[i].size < total_to_delete && 70000000 - directories[0].size + directories[i].size >= 30000000 {
             total_to_delete = directories[i].size;
         }
+    }
+
+    for i in 0..directories.len() {
+        println!("Directory: {} Size: {}", directories[i].name, directories[i].size);
     }
 
     println!("The sum of directories that are at most of 100000 size is {}", sum);

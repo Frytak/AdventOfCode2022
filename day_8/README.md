@@ -2,6 +2,8 @@
 
 # Day 8: Treetop Tree House
 
+## Part One
+
 The expedition comes across a peculiar patch of tall trees all planted carefully in a grid. The Elves explain that a previous expedition planted these trees as a reforestation effort. Now, they're curious if this would be a good location for a [tree house](https://en.wikipedia.org/wiki/Tree_house).
 
 First, determine whether there is enough tree cover here to keep a tree house <span style="color:#fff;text-shadow: 0 0 2px #fff;">hidden</span>. To do this, you need to count the number of trees that are <span style="color:#fff;text-shadow: 0 0 2px #fff;">visible from outside the grid</span> when looking directly along a row or column.
@@ -35,3 +37,47 @@ With 16 trees visible on the edge and another 5 visible in the interior, a total
 Consider your map; <span style="color:#fff;text-shadow: 0 0 2px #fff;">how many trees are visible from outside the grid?</span>
 
 To begin, [get your puzzle input](https://adventofcode.com/2022/day/8/input).
+
+## Part Two
+
+Content with the amount of tree cover available, the Elves just need to know the best spot to build their tree house: they would like to be able to see a lot of <span style="color:#fff;text-shadow: 0 0 2px #fff;">trees</span>.
+
+To measure the viewing distance from a given tree, look up, down, left, and right from that tree; stop if you reach an edge or at the first tree that is the same height or taller than the tree under consideration. (If a tree is right on the edge, at least one of its viewing distances will be zero.)
+
+The Elves don't care about distant trees taller than those found by the rules above; the proposed tree house has large eaves to keep it dry, so they wouldn't be able to see higher than the tree house anyway.
+
+In the example above, consider the middle `5` in the second row:
+
+```
+30373
+25512
+65332
+33549
+35390
+```
+
+- Looking up, its view is not blocked; it can see <span style="color:#fff;text-shadow: 0 0 2px #fff;">`1`</span> tree (of height `3`).
+- Looking left, its view is blocked immediately; it can see only <span style="color:#fff;text-shadow: 0 0 2px #fff;">`1`</span> tree (of height `5`, right next to it).
+- Looking right, its view is not blocked; it can see <span style="color:#fff;text-shadow: 0 0 2px #fff;">`2`</span> trees.
+- Looking down, its view is blocked eventually; it can see <span style="color:#fff;text-shadow: 0 0 2px #fff;">`2`</span> trees (one of height `3`, then the tree of height `5` that blocks its view).
+
+A tree's <span style="color:#fff;text-shadow: 0 0 2px #fff;">scenic score</span> is found by multiplying together its viewing distance in each of the four directions. For this tree, this is <span style="color:#fff;text-shadow: 0 0 2px #fff;">`4`</span> (found by multiplying `1 * 1 * 2 * 2`).
+
+However, you can do even better: consider the tree of height `5` in the middle of the fourth row:
+
+```
+30373
+25512
+65332
+33549
+35390
+```
+
+- Looking up, its view is blocked at <span style="color:#fff;text-shadow: 0 0 2px #fff;">`2`</span> trees (by another tree with a height of `5`).
+- Looking left, its view is not blocked; it can see <span style="color:#fff;text-shadow: 0 0 2px #fff;">`2`</span> trees.
+- Looking down, its view is also not blocked; it can see <span style="color:#fff;text-shadow: 0 0 2px #fff;">`1`</span> tree.
+- Looking right, its view is blocked at <span style="color:#fff;text-shadow: 0 0 2px #fff;">`2`</span> trees (by a massive tree of height `9`).
+
+This tree's scenic score is <span style="color:#fff;text-shadow: 0 0 2px #fff;">`8`</span> (`2 * 2 * 1 * 2`); this is the ideal spot for the tree house.
+
+Consider each tree on your map. <span style="color:#fff;text-shadow: 0 0 2px #fff;">What is the highest scenic score possible for any tree?</span>
