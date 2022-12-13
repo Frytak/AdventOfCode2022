@@ -27,7 +27,7 @@ impl Head {
                 self.current_pos.1 += position_vec;
                 if !self.is_knot_near() {
                     self.catch_up_knot();
-                    self.knot.catch_up_knots();
+                    // self.knot.catch_up_knots();
                     self.knot.add_visited(self.previous_pos);
                 }
             }
@@ -38,7 +38,7 @@ impl Head {
 
                 if !self.is_knot_near() {
                     self.catch_up_knot();
-                    self.knot.catch_up_knots();
+                    // self.knot.catch_up_knots();
                     self.knot.add_visited(self.previous_pos);
                 }
             }
@@ -85,25 +85,39 @@ impl Knot {
         }
     }
 
-    fn catch_up_knots(&mut self) {
-        let mut num: u8 = 0;
-        loop {
-            let knot = self.knot(num);
-            if knot.knot.as_ref().unwrap().knot == None {break;}
-            knot.knot.as_mut().unwrap().catch_up_knot( knot.previous_pos, knot.current_pos);
-            num += 1;
-        }
-    }
+    // fn catch_up_knots(&mut self) {
+    //     let mut num: u8 = 0;
+    //     loop {
+    //         let knot = self.knot(num);
+    //         if knot.knot.as_ref().unwrap().knot == None {break;}
+    //         knot.knot.as_mut().unwrap().catch_up_knot( knot.previous_pos, knot.current_pos);
+    //         num += 1;
+    //     }
+    // }
 
     fn knot(&mut self, num: u8) -> &mut Knot {
-        if self.knot.as_ref() == None {panic!("Cannot find knot of index {}, there are only {} knots.", num, num+1)}
+        if self.knot.as_ref() == None {panic!("Cannot find knot of index {}.", num)}
         if num == 0 {return self;}
         self.knot.as_mut().unwrap().knot(num-1)
     }
 
-    fn is_knot_near(&self) -> bool {
+    fn is_knot_cardinal(&self) -> bool {
         for y in self.current_pos.0-1..=self.current_pos.0+1 {
             for x in self.current_pos.1-1..=self.current_pos.1+1 {
+                println!("{} {}", y, x);
+                if !((y == 0 || y == 2) && (x == 0 || x == 2)) {
+                    if (y, x) == self.knot.as_ref().unwrap().current_pos {
+                        return true;
+                    }
+                }
+            }
+        }
+        false
+    }
+
+    fn is_knot_diagonal(&self) -> bool {
+        for y in (self.current_pos.0-1..=self.current_pos.0+1).step_by(2) {
+            for x in (self.current_pos.1-1..=self.current_pos.1+1).step_by(2) {
                 if (y, x) == self.knot.as_ref().unwrap().current_pos {
                     return true;
                 }
@@ -112,27 +126,27 @@ impl Knot {
         false
     }
 
-    fn catch_up_knot(&mut self, previous: (isize, isize), current: (isize, isize)) {
-        let new_pos_change = (current.0 - previous.0, current.1 - previous.1);
-        let knot = self.knot.as_mut().unwrap();
+    // fn catch_up_knot(&mut self, previous: (isize, isize), current: (isize, isize)) {
+    //     let new_pos_change = (current.0 - previous.0, current.1 - previous.1);
+    //     let knot = self.knot.as_mut().unwrap();
 
-        knot.previous_pos.0 = knot.current_pos.0;
-        knot.previous_pos.1 = knot.current_pos.1;
+    //     knot.previous_pos.0 = knot.current_pos.0;
+    //     knot.previous_pos.1 = knot.current_pos.1;
 
-        let new_y = knot.current_pos.0 + new_pos_change.0;
-        let new_x = knot.current_pos.1 + new_pos_change.1;
+    //     let new_y = knot.current_pos.0 + new_pos_change.0;
+    //     let new_x = knot.current_pos.1 + new_pos_change.1;
 
-        println!("{:?} {:?} {:?}", new_pos_change, current, previous);
+    //     println!("{:?} {:?} {:?}", new_pos_change, current, previous);
 
-        self.knot(0).current_pos.0 = new_y;
-        self.knot(0).current_pos.1 = new_x;
+    //     self.knot(0).current_pos.0 = new_y;
+    //     self.knot(0).current_pos.1 = new_x;
 
-        self.knot.as_mut().unwrap().add_visited((new_y, new_x));
-    }
+    //     self.knot.as_mut().unwrap().add_visited((new_y, new_x));
+    // }
 }
 
 fn main() {
-    let input_file_path = "C:\\Users\\Frytak\\Desktop\\~\\Important\\Programming Projects\\AdventOfCode2022\\day_9\\src\\input.txt";
+    let input_file_path = "C:\\Users\\fryta\\Pulpit\\~\\Important\\Programming Projects\\AdventOfCode2022\\day_9\\src\\input.txt";
     let input = fs::read_to_string(input_file_path)
         .expect("Something went wrong reading the file");
 
@@ -143,5 +157,5 @@ fn main() {
         head.r#move(segments[0].chars().collect::<Vec<_>>()[0], str::parse::<usize>(segments[1]).unwrap())
     }
 
-    println!("\n{:?}",head.knot(1).current_pos);
+    println!("\n{:?} {:?}",head.knot(0).is_knot_cardinal(), head.knot(0).current_pos);
 }
