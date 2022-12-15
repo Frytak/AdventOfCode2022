@@ -1,17 +1,113 @@
-use std::fs;
+use std::{fs, cell::RefCell, rc::Rc};
 
+#[derive(Debug)]
 struct Head {
     current_pos: (isize, isize),
     previous_pos: (isize, isize),
-    knot: Knot,
+    knot: Vec<Rc<RefCell<Knot>>>,
 }
 
 impl Head {
     fn new(knots: u8) -> Head {
-        Head { current_pos: (0, 0), previous_pos: (0, 0), knot: Knot::new(knots) }
+        let mut knots_vec = vec![];
+        for _ in 0..knots {
+            knots_vec.push(Rc::new(RefCell::new(Knot::new())));
+        }
+        Head { current_pos: (0, 0), previous_pos: (0, 0), knot: knots_vec }
     }
 
-    fn r#move(&mut self, direction: char, count: usize) {
+    fn is_knot_near(&self, pos: u8) -> bool {
+        if self.knot.len() <= pos as usize { panic!("Index out of bounds. The provided index was {} while the max index is {}", pos, self.knot.len()); }
+        match pos {
+            0 => {
+                for y in self.current_pos.0-1..=self.current_pos.0+1 {
+                    for x in self.current_pos.1-1..=self.current_pos.1+1 {
+                        println!("{} {} {:?}", y, x, self.knot[pos as usize].borrow().current_pos);
+
+                        if (y, x) == self.knot[pos as usize].borrow().current_pos {
+                            return true;
+                        }
+                    }
+                }
+            }
+            _ => {                
+                let knot = self.knot[(pos-1) as usize].borrow();
+                
+                for y in knot.current_pos.0-1..=knot.current_pos.0+1 {
+                    for x in knot.current_pos.1-1..=knot.current_pos.1+1 {
+                        println!("{} {} {:?}", y, x, self.knot[(pos) as usize].borrow().current_pos);
+
+                        if (y, x) == self.knot[(pos) as usize].borrow().current_pos {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        
+        false
+    }
+
+    fn was_knot_cardinal(&self, pos: u8) -> bool {
+        if self.knot.len() <= pos as usize { panic!("Index out of bounds. The provided index was {} while the max index is {}", pos, self.knot.len()); }
+
+        match pos {
+            0 => {
+                for y in self.previous_pos.0-1..=self.previous_pos.0+1 {
+                    for x in self.previous_pos.1-1..=self.previous_pos.1+1 {
+                        if !((y == self.previous_pos.0-1 || y == self.previous_pos.0+1) && (x == self.current_pos.1-1 || x == self.current_pos.1+1)) {
+                            if (y, x) == self.knot[pos as usize].borrow().current_pos {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            _ => {                
+                let knot = self.knot[pos as usize].borrow();
+
+                for y in knot.previous_pos.0-1..=knot.previous_pos.0+1 {
+                    for x in knot.previous_pos.1-1..=knot.previous_pos.1+1 {
+                        if !((y == knot.previous_pos.0-1 || y == knot.previous_pos.0+1) && (x == self.current_pos.1-1 || x == self.current_pos.1+1)) {
+                            if (y, x) == self.knot[pos as usize].borrow().current_pos {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        false
+    }
+
+    fn was_knot_diagonal(&self, pos: u8, knot: &Knot, child_knot: Option<Knot>) -> bool {
+        if self.knot.len() <= pos as usize { panic!("Index out of bounds. The provided index was {} while the max index is {}", pos, self.knot.len()); }
+        if pos != 0 && child_knot == None { panic!("If pos is not 0 you need to specify the child knot... sadly") }
+        match pos {
+            0 => {
+                for y in (self.previous_pos.0-1..=self.previous_pos.0+1).step_by(2) {
+                    for x in (self.previous_pos.1-1..=self.previous_pos.1+1).step_by(2) {
+                        if (y, x) == knot.current_pos {
+                            return true;
+                        }
+                    }
+                }
+            },
+            _ => {
+                for y in (knot.previous_pos.0-1..=knot.previous_pos.0+1).step_by(2) {
+                    for x in (knot.previous_pos.1-1..=knot.previous_pos.1+1).step_by(2) {
+                        if (y, x) == child_knot.as_ref().unwrap().current_pos {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        false
+    }
+
+    fn move_by(&mut self, direction: char, count: usize) {
         self.previous_pos = self.current_pos;
 
         let position_vec;
@@ -21,128 +117,88 @@ impl Head {
             _ => return,
         }
 
-        if direction == 'R' || direction == 'L' {
-            for _ in 1..=count {
-                self.previous_pos.1 = self.current_pos.1;
-                self.current_pos.1 += position_vec;
-                if !self.is_knot_near() {
-                    self.catch_up_knot();
-                    // self.knot.catch_up_knots();
-                    self.knot.add_visited(self.previous_pos);
-                }
-            }
-        } else {
-            for _ in 1..=count {
-                self.previous_pos.0 = self.current_pos.0;
-                self.current_pos.0 += position_vec;
+        match direction {
+            'R' | 'L' => {
+                for _ in 1..=count {
+                    self.previous_pos.1 = self.current_pos.1;
+                    self.current_pos.1 += position_vec;
 
-                if !self.is_knot_near() {
-                    self.catch_up_knot();
-                    // self.knot.catch_up_knots();
-                    self.knot.add_visited(self.previous_pos);
+                    self.catch_up_knots();
                 }
-            }
+            },
+            'D' | 'U' => {
+                for _ in 1..=count {
+                    self.previous_pos.0 = self.current_pos.0;
+                    self.current_pos.0 += position_vec;
+                    
+                    self.catch_up_knots();
+                }
+            },
+            _ => return,
         }
     }
 
-    fn knot(&mut self, num: u8) -> &mut Knot {
-        self.knot.knot(num)
-    }
+    
 
-    fn is_knot_near(&self) -> bool {
-        for y in self.current_pos.0-1..=self.current_pos.0+1 {
-            for x in self.current_pos.1-1..=self.current_pos.1+1 {
-                if (y, x) == self.knot.current_pos {
-                    return true;
-                }
-            }
-        }
-        false
-    }
+    fn catch_up_knot(&mut self, pos: u8) {
+        if self.knot.len() <= pos as usize { panic!("Index out of bounds. The provided index was {} while the max index is {}", pos, self.knot.len()); }
 
-    fn catch_up_knot(&mut self) {
-        self.knot.current_pos = self.previous_pos
-    }
-}
+        if !self.is_knot_near(pos) {
+            println!("T");
+            let mut knot = self.knot[pos as usize].borrow_mut();
+            let mut child_knot = self.knot[(pos+1) as usize].borrow_mut();
 
-#[derive(PartialEq)]
-struct Knot {
-    current_pos: (isize, isize),
-    previous_pos: (isize, isize),
-    visited_pos: Vec<(isize, isize)>,
-    knot: Option<Box<Knot>>,
-}
+            match pos {
+                0 => {
+                    knot.previous_pos = knot.current_pos;
 
-impl Knot {
-    fn new(level: u8) -> Knot {
-        if level == 0 {return Knot { current_pos: (0, 0), previous_pos: (0, 0), visited_pos: vec![(0, 0)], knot: None }}
-        Knot { current_pos: (0, 0), previous_pos: (0, 0), visited_pos: vec![(0, 0)], knot: Some(Box::new(Knot::new(level - 1))) }
-    }
+                    if self.was_knot_diagonal(pos, &knot, None) {
+                        knot.current_pos = self.previous_pos;
+                    } else {
+                        let new_pos_change = (self.current_pos.0 - self.previous_pos.0, self.current_pos.1 - self.previous_pos.1);
 
-    fn add_visited(&mut self, position: (isize, isize)) {
-        if !self.visited_pos.contains(&position) {
-            self.visited_pos.push(position);
-        }
-    }
+                        knot.current_pos.0 += new_pos_change.0;
+                        knot.current_pos.1 += new_pos_change.1;
+                    }
+                },
+                _ => {
+                    if self.was_knot_diagonal(pos, &knot, Some(child_knot.clone())) {
+                        child_knot.current_pos = knot.previous_pos;
+                    } else {
+                        let new_pos_change = (knot.current_pos.0 - knot.previous_pos.0, knot.current_pos.1 - knot.previous_pos.1);
 
-    // fn catch_up_knots(&mut self) {
-    //     let mut num: u8 = 0;
-    //     loop {
-    //         let knot = self.knot(num);
-    //         if knot.knot.as_ref().unwrap().knot == None {break;}
-    //         knot.knot.as_mut().unwrap().catch_up_knot( knot.previous_pos, knot.current_pos);
-    //         num += 1;
-    //     }
-    // }
-
-    fn knot(&mut self, num: u8) -> &mut Knot {
-        if self.knot.as_ref() == None {panic!("Cannot find knot of index {}.", num)}
-        if num == 0 {return self;}
-        self.knot.as_mut().unwrap().knot(num-1)
-    }
-
-    fn is_knot_cardinal(&self) -> bool {
-        for y in self.current_pos.0-1..=self.current_pos.0+1 {
-            for x in self.current_pos.1-1..=self.current_pos.1+1 {
-                println!("{} {}", y, x);
-                if !((y == 0 || y == 2) && (x == 0 || x == 2)) {
-                    if (y, x) == self.knot.as_ref().unwrap().current_pos {
-                        return true;
+                        child_knot.current_pos.0 += new_pos_change.0;
+                        child_knot.current_pos.1 += new_pos_change.1;
                     }
                 }
             }
         }
-        false
     }
 
-    fn is_knot_diagonal(&self) -> bool {
-        for y in (self.current_pos.0-1..=self.current_pos.0+1).step_by(2) {
-            for x in (self.current_pos.1-1..=self.current_pos.1+1).step_by(2) {
-                if (y, x) == self.knot.as_ref().unwrap().current_pos {
-                    return true;
-                }
-            }
+    fn catch_up_knots(&mut self) {
+        for i in 0..self.knot.len()-1 {
+            self.catch_up_knot(i as u8);
         }
-        false
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+struct Knot {
+    current_pos: (isize, isize),
+    previous_pos: (isize, isize),
+    visited_pos: Vec<(isize, isize)>,
+}
+
+impl Knot {
+    fn new() -> Knot {
+        Knot { current_pos: (0, 0), previous_pos: (0, 0), visited_pos: vec![(0, 0)] }
     }
 
-    // fn catch_up_knot(&mut self, previous: (isize, isize), current: (isize, isize)) {
-    //     let new_pos_change = (current.0 - previous.0, current.1 - previous.1);
-    //     let knot = self.knot.as_mut().unwrap();
-
-    //     knot.previous_pos.0 = knot.current_pos.0;
-    //     knot.previous_pos.1 = knot.current_pos.1;
-
-    //     let new_y = knot.current_pos.0 + new_pos_change.0;
-    //     let new_x = knot.current_pos.1 + new_pos_change.1;
-
-    //     println!("{:?} {:?} {:?}", new_pos_change, current, previous);
-
-    //     self.knot(0).current_pos.0 = new_y;
-    //     self.knot(0).current_pos.1 = new_x;
-
-    //     self.knot.as_mut().unwrap().add_visited((new_y, new_x));
-    // }
+    fn add_visited(&mut self) {
+        if !self.visited_pos.contains(&self.current_pos) {
+            self.visited_pos.push(self.current_pos);
+        }
+    }
 }
 
 fn main() {
@@ -154,8 +210,10 @@ fn main() {
 
     for line in input.lines() {
         let segments = line.split(' ').collect::<Vec<_>>();
-        head.r#move(segments[0].chars().collect::<Vec<_>>()[0], str::parse::<usize>(segments[1]).unwrap())
+        let direction = segments[0].chars().collect::<Vec<_>>()[0];
+        let num = str::parse::<usize>(segments[1]).unwrap();
+        head.move_by(direction, num);
     }
 
-    println!("\n{:?} {:?}",head.knot(0).is_knot_cardinal(), head.knot(0).current_pos);
+    println!("\n{:?}", head);
 }
